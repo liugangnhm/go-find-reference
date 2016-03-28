@@ -135,11 +135,33 @@ class Thread(threading.Thread):
         else:
             self.thread()
 
+    def get_cmd_path(self):
+        # load gopath from settings
+        settings = sublime.load_settings(
+            "GolangFindReference.sublime-settings")
+        gopath = settings.get("gopath", os.getenv('GOPATH'))
+        if not gopath:
+            return ""
+        gopaths = gopath.split(os.pathsep)
+        for p in gopaths:
+            fullpath = p + "/bin/" + cmd_name
+            if os.name == "nt":
+                fullpath = p + "\\bin\\" + cmd_name + ".exe"
+            if os.path.exists(fullpath):
+                return fullpath
+        return ""
+
     def thread(self):
         all_lines = ""
         folders = sublime.active_window().folders()
+        cmd_path = self.get_cmd_path()
+        if len(cmd_path) <= 0:
+            print(
+                "[Debug]: go-find-references command not found in your path.")
+            return
+
         for d in folders:
-            args = [cmd_name, "-file", self.file, "-offset",
+            args = [cmd_path, "-file", self.file, "-offset",
                     str(self.offset), "-root", d]
             print("[Debug]: ", args)
             startupinfo = None
@@ -158,7 +180,9 @@ class Thread(threading.Thread):
             result = output.decode("utf-8")
             # lines = result.strip().splitlines()
             all_lines += result
-            print("[Debug] result: ", all_lines)
+            print("[Debug] result: ", all_lines, len(all_lines))
 
+        if len(all_lines) <= 0:
+            return
         self.view.run_command(
             'golang_find_reference_render', {"result": all_lines})
