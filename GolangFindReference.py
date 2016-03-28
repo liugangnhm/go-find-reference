@@ -76,7 +76,7 @@ class GolangFindReferenceRenderCommand(sublime_plugin.TextCommand):
                 rview = view
                 break
 
-        if rview == None:
+        if rview is None:
             rview = self.window.new_file()
         rview.set_name(view_name)
         rview.set_scratch(True)
