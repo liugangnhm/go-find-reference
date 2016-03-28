@@ -52,6 +52,7 @@ class GolangFindReferenceRenderCommand(sublime_plugin.TextCommand):
     def run(self, edit, **args):
         self.result = args.get("result")
         self.edit = edit
+        self.window = sublime.active_window()
         self.rview = self.get_view()
 
         lines = self.result.strip().splitlines()
@@ -66,17 +67,22 @@ class GolangFindReferenceRenderCommand(sublime_plugin.TextCommand):
         self.window.focus_view(self.rview)
 
     def get_view(self):
-        self.window = sublime.active_window()
-
+        print("[Debug]: view count: ", len(self.window.views()))
+        rview = None
         for view in self.window.views():
             if view.settings().get(go_reference_result_tag, False):
+                print("[Debug]: erase view.")
                 view.erase(self.edit, sublime.Region(0, view.size()))
-        view = self.window.new_file()
-        view.set_name(view_name)
-        view.set_scratch(True)
-        view.settings().set(go_reference_result_tag, True)
+                rview = view
+                break
 
-        return view
+        if rview == None:
+            rview = self.window.new_file()
+        rview.set_name(view_name)
+        rview.set_scratch(True)
+        rview.settings().set(go_reference_result_tag, True)
+
+        return rview
 
 
 class GolangFindReferenceEvent(sublime_plugin.EventListener):
