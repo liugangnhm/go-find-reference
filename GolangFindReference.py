@@ -138,9 +138,10 @@ class Thread(threading.Thread):
     def get_cmd_path(self):
         # load gopath from settings
         settings = sublime.load_settings(
-            "GolangFindReference.sublime-settings")
+            "GoFindReference.sublime-settings")
         gopath = settings.get("gopath", os.getenv('GOPATH'))
         if not gopath:
+            print("[Debug]:gopath not found.")
             return ""
         gopaths = gopath.split(os.pathsep)
         for p in gopaths:
