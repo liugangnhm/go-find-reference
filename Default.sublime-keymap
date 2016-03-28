@@ -1,0 +1,6 @@
+[
+	{
+		"keys":["alt+f"],
+		"command":"golang_find_reference",
+	},
+]
