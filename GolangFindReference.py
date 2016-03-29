@@ -72,8 +72,7 @@ class GolangFindReferenceRenderCommand(sublime_plugin.TextCommand):
         for view in self.window.views():
             if view.settings().get(go_reference_result_tag, False):
                 print("[Debug]: erase view.")
-                view.erase(self.edit, sublime.Region(0, view.size()))
-                rview = view
+                view.close()
                 break
 
         if rview is None:
